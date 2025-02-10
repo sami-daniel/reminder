@@ -1,0 +1,77 @@
+#!/usr/bin/ruby
+
+require './lib/models'
+require './lib/service'
+require 'time'
+
+cmd = ARGV[0]
+service = Reminder::Service::ReminderService.new
+
+case cmd
+when "--add"
+    STDERR.puts "Invalid number of arguments: \nExpected: 3\n Founded: #{ARGV.length}" unless ARGV.length >= 3
+    
+    description = ARGV[1]
+    timestamp = ARGV[2]
+  
+    begin
+        timestamp = Time.parse(timestamp)
+
+        if timestamp <= Time.now
+            STDERR.puts "The reminder cannot be defined before now."
+        end
+    rescue ArgumentError
+        STDERR.puts "Invalid timestamp format. Expected format: YYYY-MM-DDTHH:MM:SS or HH:MM\n"
+    end
+
+    remind = Reminder::Models::Remind.new(description, timestamp)
+    service.save(remind)
+when "--list-all"
+    puts service.list_all
+when "--delete"
+    raise ArgumentError.new("\nInvalid number of arguments: \nExpected: 2\n Founded: 1") unless ARGV.length >= 2
+
+    remind_id = ARGV[1]
+    result = service.delete(remind_id.to_i)
+
+    if result == -1
+        STDERR.puts "The ID of the entity to be deleted does not correspond to any reminders."
+    end
+when "--delete-all"
+    while true
+        puts "Are you sure? (y/n): "
+        
+        ARGV.clear # For some reason, the gets is interacting with the --delete-all argument, so just clear the array to avoid it
+        
+        ans = gets.chomp.downcase
+
+        if ans != "y" && ans != "n"
+            p ans
+            STDERR.puts "\nBad answer buddy"
+            next
+        end
+
+        service.delete_all
+        break
+    end
+when "--help"
+    puts <<~HELP
+        Usage: ruby script.rb [command] [options]
+
+        Commands:
+          --add DESCRIPTION TIMESTAMP    Adds a new reminder with the given description and timestamp.
+                                        Timestamp format should be: YYYY-MM-DDTHH:MM:SS or HH:MM.
+          
+          --list-all                    Lists all reminders.
+          
+          --delete REMINDER_ID          Deletes the reminder with the specified ID.
+          
+          --delete-all                  Deletes all reminders after a confirmation.
+          
+          --help                        Shows this help message.
+    HELP
+else
+    STDERR.puts "Invalid operation. Use reminder --help to the correctly usage of reminder."
+end
+
+Reminder::Service::destroy
