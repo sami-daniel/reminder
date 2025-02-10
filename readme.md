@@ -15,9 +15,6 @@ A simple Ruby-based Command Line Interface (CLI) program to manage reminders. Th
 - Ruby version 3.0 or higher.
 - SQLite3 package
 
-## Disclaimer
-- Windows users may alter the shebang and turn into the script in .exe to allow execute the script
-
 ## Installation
 
 1. Clone the repository to your local machine:
@@ -41,9 +38,22 @@ A simple Ruby-based Command Line Interface (CLI) program to manage reminders. Th
 You can make a soft link to reminder binary to use it from everywhere on your terminal
 
 ```bash
-   sudo ln -s ./reminder /usr/bin/reminder
+   sudo ln -s /path/to/reminder/program/reminder /usr/bin/reminder
 ```
 
 ## Next steps
 
 - Implement notification system using libnotify-bin
+
+## For RVM users
+
+The ruby interpreter may not be available where the shebang requires (/usr/bin/), but you 
+can do it with a simple soft link.
+```bash
+   sudo ln -s /home/your_user/.rvm/rubies/your_ruby_version/bin/ruby /usr/bin/ruby
+```
+
+
+## Disclaimer
+- At this point, reminder is not compatible with Windows, but is an very good idea for the future.
+- Windows users may alter some files to use reminder correctly.
